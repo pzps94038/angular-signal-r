@@ -53,7 +53,7 @@ export class SignalRService {
    * @returns
    */
   publicLiveChatRoom() {
-    this.start().pipe(
+    return this.start().pipe(
       switchMap(
         (connection) =>
           new Observable<any>((subscriber) => {
