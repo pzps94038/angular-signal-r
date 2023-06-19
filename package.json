@@ -19,7 +19,10 @@
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
     "@microsoft/signalr": "^7.0.5",
+    "@ng-icons/core": "^25.1.0",
+    "@ng-icons/heroicons": "^25.1.0",
     "@ngneat/dialog": "^4.0.0",
+    "lottie-web": "^5.12.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"

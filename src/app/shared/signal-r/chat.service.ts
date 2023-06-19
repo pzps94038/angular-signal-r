@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Observable, from, map, of, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import * as signalR from '@microsoft/signalr';
+import { JoinLiveChatRoomResponse } from './chat.model';
 @Injectable({
   providedIn: 'root',
 })
-export class SignalRService {
+export class ChatService {
+  connectionId = signal<undefined | string>(undefined);
   private _connection$?: Observable<signalR.HubConnection>;
 
   /**
@@ -43,7 +45,9 @@ export class SignalRService {
   joinLiveChatRoom(name: string) {
     return this.start().pipe(
       switchMap((connection) =>
-        from(connection.invoke('JoinLiveChatRoom', name))
+        from(
+          connection.invoke<JoinLiveChatRoomResponse>('JoinLiveChatRoom', name)
+        )
       )
     );
   }
