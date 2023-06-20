@@ -19,6 +19,7 @@ import { catchError, finalize } from 'rxjs';
 import { ChatService } from '../shared/signal-r/chat.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReturnCode } from '../shared/api/shared/shared.model';
+import { ValidService } from '../shared/service/valid.service';
 @Component({
   selector: 'app-join-chat',
   standalone: true,
@@ -35,6 +36,7 @@ import { ReturnCode } from '../shared/api/shared/shared.model';
 })
 export class JoinChatComponent {
   chatSrv = inject(ChatService);
+  validSrv = inject(ValidService);
   router = inject(Router);
   loading = signal(false);
 
@@ -42,7 +44,10 @@ export class JoinChatComponent {
   private _destroyRef = inject(DestroyRef);
 
   form = new FormGroup({
-    name: new FormControl('', [Validators.required]),
+    name: new FormControl('', [
+      Validators.required,
+      this.validSrv.emptyValidator(),
+    ]),
   });
 
   get name() {
