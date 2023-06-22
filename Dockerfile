@@ -1,7 +1,13 @@
-FROM node:16
+# stage 1
+FROM node:16 as node
 WORKDIR /app
-COPY package*.json ./
+COPY . .
 RUN npm ci
 RUN npm run build
-COPY . .
-CMD ["npm", "run", "start:prod"]
+
+FROM nginx:alpine
+# 複製打包檔案，angular.json的outputPath
+COPY --from=node /app/dist/angular-signal-r /usr/share/nginx/html
+# 覆蓋image裡的設定檔
+COPY /nginx.conf  /etc/nginx/conf.d/default.conf
+EXPOSE 80
