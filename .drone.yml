@@ -28,6 +28,7 @@ steps:
     settings:
       input:
         - dist
+        - coverage
       output: chat.zip
     when:
       branch:
