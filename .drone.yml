@@ -1,0 +1,68 @@
+kind: pipeline
+name: default
+
+workspace:
+  base: /src
+  path: drone_chat
+
+steps:
+  - name: install-package
+    image: node:16
+    commands:
+      - echo install package
+      - npm ci
+  - name: test
+    image: node:16
+    commands:
+      - echo install Chrome
+      - apt-get update -qq && apt-get install -qq --no-install-recommends chromium && apt-get clean && rm -rf /var/lib/apt/lists/* && ln -s /usr/bin/chromium /usr/bin/google-chrome
+      - echo test
+      - npm run test-ci
+  - name: build
+    image: node
+    commands:
+      - echo build
+      - npm run build
+  - name: docker build && push
+    image: plugins/docker
+    settings:
+      repo: pzps94038/chat
+      username: pzps94038
+      password:
+        from_secret: DOCKER_PWD
+      no_cache: true
+      tags:
+        - latest
+        - main
+    when:
+      branch:
+        - main
+      event:
+        - push
+  - name: deploy
+    image: appleboy/drone-ssh
+    settings:
+      host:
+        from_secret: SCP_HOST
+      username:
+        from_secret: SCP_USER
+      password:
+        from_secret: SCP_PWD
+      port: 22
+      command_timeout: 2m
+      script:
+        - docker stop chat || true && docker rm chat || true && docker pull pzps94038/chat:latest && docker run -d -p 8085:80 --name chat --restart=always -e PORT=80 pzps94038/chat:latest
+    when:
+      branch:
+        - main
+      event:
+        - push
+
+trigger:
+  branch:
+    - main
+    - develop
+  event:
+    - push
+    - pull_request
+    - tag
