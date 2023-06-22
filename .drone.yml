@@ -27,8 +27,7 @@ steps:
     image: lunagod/drone-zip
     settings:
       input:
-        - dist/*
-        - coverage/8
+        - dist
       output: Chat.zip
     when:
       branch:
