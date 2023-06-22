@@ -27,7 +27,7 @@ steps:
     image: node:16
     commands:
       - apt-get update && apt-get -y install zip
-      - zip -r Chat.zip dist
+      - zip -r Chat.zip dist coverage
     when:
       branch:
         - main
