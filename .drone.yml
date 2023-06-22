@@ -24,11 +24,10 @@ steps:
       - echo build
       - npm run build
   - name: zip
-    image: lunagod/drone-zip:1.1.3
-    settings:
-      input:
-        - dist
-      output: Chat.zip
+    image: node:16
+    commands:
+      - apt-get update && apt-get -y install zip
+      - zip -r Chat.zip dist
     when:
       branch:
         - main
