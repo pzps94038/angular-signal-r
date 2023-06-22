@@ -23,6 +23,49 @@ steps:
     commands:
       - echo build
       - npm run build
+  - name: zip
+    image: lunagod/drone-zip
+    settings:
+      input:
+        - dist
+        - coverage
+      output: chat.zip
+    when:
+      branch:
+        - main
+      event:
+        - push
+  - name: artifact
+    image: appleboy/drone-scp
+    settings:
+      host:
+        from_secret: SCP_HOST
+      username:
+        from_secret: SCP_USER
+      password:
+        from_secret: SCP_PWD
+      port: 22
+      overwrite: true
+      rm: true
+      target: /file-server/chat
+      source: chat.zip
+    when:
+      branch:
+        - main
+      event:
+        - push
+  - name: artifact Upload Finish
+    image: node:16
+    commands:
+      - echo -e "\n
+        ====================================================================\n
+        ✅ fileUpload artifact in https://file-server.ronwebs.com/chat\n
+        ===================================================================="
+    when:
+      branch:
+        - main
+      event:
+        - push
   - name: docker build && push
     image: plugins/docker
     settings:
@@ -51,7 +94,14 @@ steps:
       port: 22
       command_timeout: 2m
       script:
-        - docker stop chat || true && docker rm chat || true && docker pull pzps94038/chat:latest && docker run -d -p 8085:80 --name chat --restart=always -e PORT=80 pzps94038/chat:latest
+        - echo ======開始部署=======
+        - docker stop chat || true &&
+          docker rm chat || true &&
+          docker pull pzps94038/chat:latest &&
+          docker run -d -p 8085:80 --name chat --restart=always
+          -e PORT=80
+          pzps94038/chat:latest
+        - echo ======部署完成=======
     when:
       branch:
         - main
