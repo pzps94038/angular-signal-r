@@ -27,9 +27,9 @@ steps:
     image: lunagod/drone-zip
     settings:
       input:
-        - dist
+        - dist/*
         - coverage
-      output: chat.zip
+      output: Chat.zip
     when:
       branch:
         - main
@@ -47,19 +47,19 @@ steps:
       port: 22
       overwrite: true
       rm: true
-      target: /file-server/chat
-      source: chat.zip
+      target: /file-server/Chat
+      source: Chat.zip
     when:
       branch:
         - main
       event:
         - push
-  - name: artifact Upload Finish
+  - name: artifact upload finish
     image: node:16
     commands:
       - echo -e "\n
         ====================================================================\n
-        ✅ fileUpload artifact in https://file-server.ronwebs.com/chat\n
+        ✅ fileUpload artifact in https://file-server.ronwebs.com/Chat\n
         ===================================================================="
     when:
       branch:
@@ -107,6 +107,27 @@ steps:
         - main
       event:
         - push
+  - name: notify
+    image: drillster/drone-email
+    settings:
+      host: smtp.gmail.com
+      username:
+        from_secret: GMAIL_SENDER_EMAIL
+      password:
+        from_secret: GMAIL_PWD
+      from:
+        from_secret: GMAIL_SENDER_EMAIL
+      recipients_only: true
+      recipients:
+        - pzps94038@yahoo.com.tw
+    when:
+      branch:
+        - main
+      event:
+        - push
+      status:
+        - success
+        - failure
 
 trigger:
   branch:
